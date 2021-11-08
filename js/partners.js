@@ -1,11 +1,13 @@
 const partners = () => {
     const cardsRestaurants = document.querySelector('.cards-restaurants');
+    const modalAuth = document.querySelector('.modal-auth');
+
 
     const renderItems = (data) => {
         data.forEach((item) => {
             const a = document.createElement('a');
             const { image, kitchen, name, price, products, stars, time_of_delivery } = item;
-            a.setAttribute('href', '/restaurant.html');
+            a.setAttribute('href', '/DeliveryFood/restaurant.html');
             a.classList.add('card');
             a.classList.add('card-restaurant');
             a.dataset.products = products;
@@ -32,7 +34,7 @@ const partners = () => {
 
                 if (localStorage.getItem('user')) {
                     localStorage.setItem('restaurant', JSON.stringify(item));
-                    window.location.href = '/restaurant.html';
+                    window.location.href = '/DeliveryFood/restaurant.html';
                 } else {
                     modalAuth.style.display = 'flex';
                 }

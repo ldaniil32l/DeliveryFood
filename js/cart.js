@@ -43,6 +43,7 @@ const cart = () => {
 
     const renderItems = (data) => {
         body.innerHTML = '';
+        allPrice.textContent = `0 ₽`;
         data.forEach(({ name, price, id, count }) => {
             const cartElem = document.createElement('div');
 
@@ -67,7 +68,7 @@ const cart = () => {
             return sumPrice + price * count;
         }, 0);
 
-        allPrice.textContent = `${result}  ₽`;
+        allPrice.textContent = `${result} ₽`;
     }
 
     body.addEventListener('click', (e) => {
@@ -100,6 +101,9 @@ const cart = () => {
     buttonCart.addEventListener('click', () => {
         if (localStorage.getItem('cart')) {
             renderItems(JSON.parse(localStorage.getItem('cart')));
+        } else {
+            body.innerHTML = '';
+            allPrice.textContent = `0 ₽`;
         }
         modalCart.classList.add('is-open');
     });
