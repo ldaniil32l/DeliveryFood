@@ -1,26 +1,43 @@
-const cardsMenu = document.querySelector('.cards-menu');
+const menu = () => {
+    const cardsMenu = document.querySelector('.cards-menu');
 
-const changeInfo = ({ name, stars, price, kitchen }) => {
-    const restaurantTitle = document.querySelector('.restaurant-title');
-    restaurantTitle.textContent = name;
+    const cartArray = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')): [];
 
-    const restaurantRating = document.querySelector('.rating');
-    restaurantRating.textContent = stars;
+    const changeInfo = ({ name, stars, price, kitchen }) => {
+        const restaurantTitle = document.querySelector('.restaurant-title');
+        restaurantTitle.textContent = name;
 
-    const restaurantPrice = document.querySelector('.price');
-    restaurantPrice.textContent = `от ${price} ₽`;
+        const restaurantRating = document.querySelector('.rating');
+        restaurantRating.textContent = stars;
 
-    const restaurantCategory = document.querySelector('.category');
-    restaurantCategory.textContent = kitchen;
-}
+        const restaurantPrice = document.querySelector('.price');
+        restaurantPrice.textContent = `от ${price} ₽`;
 
-const renderItems = (data) => {
-    data.forEach(({ description, id, image, name, price }) => {
-        const card = document.createElement('div');
+        const restaurantCategory = document.querySelector('.category');
+        restaurantCategory.textContent = kitchen;
+    }
 
-        card.classList.add('card');
+    const addToCart = (cartItem) => {
+        if(cartArray.some((item) => item.id === cartItem.id)) {
+            cartArray.map((item => {
+                if (item.id === cartItem.id) {
+                    item.count++;
+                }
+                return item;
+            }));
+        } else {
+            cartArray.push(cartItem);
+            localStorage.setItem('cart', JSON.stringify(cartArray))
+        }
+    }
 
-        card.innerHTML = `
+    const renderItems = (data) => {
+        data.forEach(({ description, id, image, name, price }) => {
+            const card = document.createElement('div');
+
+            card.classList.add('card');
+
+            card.innerHTML = `
             <img src="${image}" alt="${name}" class="card-image" />
 			<div class="card-text">
 				<div class="card-heading">
@@ -39,24 +56,30 @@ const renderItems = (data) => {
 					<strong class="card-price-bold">${price} ₽</strong>
 			    </div>
             </div>
-        `;
+            `;
 
-        cardsMenu.append(card)
-    });
+            card.querySelector('.button-card-text').addEventListener('click', () => {
+                addToCart({ name, price, id, count: 1 });
+            });
+
+            cardsMenu.append(card)
+        });
+    }
+
+    if (localStorage.getItem('restaurant')) {
+        const restaurant = JSON.parse(localStorage.getItem('restaurant'));
+        changeInfo(restaurant);
+        fetch(`https://mydeliveryfood-daniil32-default-rtdb.firebaseio.com/db/${restaurant.products}`)
+            .then((response) => response.json())
+            .then((data) => {
+                renderItems(data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    } else {
+        window.location.href = '/';
+    }
 }
 
-if (localStorage.getItem('restaurant')) {
-    const restaurant = JSON.parse(localStorage.getItem('restaurant'));
-    changeInfo(restaurant);
-    fetch(`https://mydeliveryfood-daniil32-default-rtdb.firebaseio.com/db/${restaurant.products}`)
-    .then((response) => response.json())
-    .then((data) => {
-        renderItems(data);
-    })
-    .catch((error) => {
-        console.log(error);
-    });
-} else {
-    window.location.href = '/';
-}
-
+menu();
